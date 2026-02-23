@@ -55,7 +55,7 @@ export interface SearchResult {
 export async function searchSong(input: string): Promise<SearchResult | null> {
   const parsed = parseInput(input);
 
-  // Step A: Fetch from Spotify
+  // Step 1: Fetch from Spotify
   let spotifyData = null;
   if (parsed.type === "spotify_url") {
     spotifyData = await getSpotifyTrackById(parsed.value);
@@ -88,7 +88,7 @@ export async function searchSong(input: string): Promise<SearchResult | null> {
     }
   }
 
-  // Step C: YouTube fallback for non-Spotify tracks
+  // Step 3: YouTube fallback for non-Spotify tracks
   let youtubeData = null;
   if (!spotifyData && (parsed.type === "youtube_url" || parsed.type === "query")) {
     youtubeData =
@@ -104,7 +104,7 @@ export async function searchSong(input: string): Promise<SearchResult | null> {
   const title = spotifyData?.title ?? youtubeData?.title ?? "";
   const artist = spotifyData?.artist ?? youtubeData?.artist ?? "";
 
-  // Step D: Context search for backstory
+  // Step 4: Context search for backstory
   const context = await fetchSongContext(title, artist);
 
   const result: SearchResult = {
@@ -126,7 +126,7 @@ export async function searchSong(input: string): Promise<SearchResult | null> {
     cached: false,
   };
 
-  // Step 4: Store to Supabase
+  // Step 5: Store to Supabase
   if (result.isrc) {
     await upsertSong({
       isrc: result.isrc,
